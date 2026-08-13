@@ -1,0 +1,25 @@
+# Gradle / Android 构建产物
+build/
+app/build/
+.gradle/
+.kotlin/
+*.apk
+*.aab
+*.iml
+
+# 本机配置（SDK 路径等）
+local.properties
+.idea/
+
+# Claude Code 本地设置
+.claude/
+
+# Termux 内置环境归档（332MB 超 GitHub 100MB 限制，由 scripts/build_termux_root.py 生成）
+app/src/main/assets/termux-root.tar
+
+# 第三方 skill 收集（本地参考，含 Windows 二进制，不进仓库）
+别的软件好用的skills/
+
+# 运行时个人数据
+.reasonix-backup/
+*.log

@@ -1,0 +1,10 @@
+# 统一 LF 行尾（Windows 开发者提交时自动转换）
+* text=auto
+*.kt text
+*.kts text
+*.md text
+*.xml text
+*.json text
+*.properties text
+*.bat text eol=crlf
+*.gradle text
