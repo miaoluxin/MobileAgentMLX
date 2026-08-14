@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 """Generate MLX launcher icon foreground (adaptive icon) + previews.
 
-Design: pure black background, thin white ring, bold uppercase MLX,
-flat horizontal tagline "MAKE LEARN EXTRAORDINARY" below it.
-Flat 2D, no shadow, no gradient.
+Design: pure black background, bold uppercase MLX, flat horizontal
+tagline "MAKE LEARN EXTRAORDINARY" below it. Flat 2D, no shadow,
+no gradient, no ring.
 
 Adaptive icon geometry: 108dp layer -> 432px canvas.
 Guaranteed safe zone = center 66dp circle (radius 132px @432).
 All artwork is kept inside the safe zone so any launcher mask shape
-(circle / squircle / teardrop) shows the full ring + text.
+(circle / squircle / teardrop) shows the full text.
 
 Rendered at 4x supersample, LANCZOS downscale for crisp edges.
 
@@ -49,24 +49,6 @@ def load_font(size):
         else:
             raise SystemExit("[ERR] no bold font found in C:\\Windows\\Fonts")
     return ImageFont.truetype(_FONT_PATH, size)
-
-
-def ring_layer(size_px, cx, cy, r, w, ss):
-    """White ring as RGBA layer.
-
-    Drawn in single-channel 8x supersample: PIL's ellipse bbox is integer,
-    so at low factors the circle center wobbles ~1px around the circumference.
-    At 8x the residual wobble is ~0.1px -- keeps the thin stroke uniform.
-    """
-    layer = Image.new("L", (size_px * ss, size_px * ss), 0)
-    rr = r * ss
-    ImageDraw.Draw(layer).ellipse(
-        [cx * ss - rr, cy * ss - rr, cx * ss + rr, cy * ss + rr],
-        outline=255, width=int(round(w * ss)))
-    layer = layer.resize((size_px, size_px), Image.LANCZOS)
-    out = Image.new("RGBA", (size_px, size_px), WHITE)
-    out.putalpha(layer)
-    return out
 
 
 def text_width(font, text, tracking):
@@ -134,8 +116,6 @@ def gen_foreground():
     img.alpha_composite(render_text_layer(size, tag, tag_font, 1.6 * s, cx, 255 * s))
 
     out = img.resize((432, 432), Image.LANCZOS)
-    # thin white ring, fully inside 66dp safe zone (radius 132px @432)
-    out.alpha_composite(ring_layer(432, 216, 216, 125, 5, ss=8))
     out.save(RES_PNG)
 
     # verify: ink must stay inside the safe-zone circle
@@ -161,7 +141,6 @@ def gen_previews():
     img = Image.new("RGBA", (n, n), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     d.rounded_rectangle([0, 0, n - 1, n - 1], radius=224, fill=BLACK)
-    img.alpha_composite(ring_layer(n, 512, 512, 430, 14, ss=8))
     mlx_font = fit_font("MLX", 770, tracking=0)
     img.alpha_composite(render_text_layer((n, n), "MLX", mlx_font, 0, 512, 490))
     tag = "MAKE LEARN EXTRAORDINARY"
